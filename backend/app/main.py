@@ -1,3 +1,5 @@
+from fastapi.middleware.cors import CORSMiddleware
+from app.config import settings
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -42,6 +44,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+
+# Allow requests from the configured frontend.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.frontend_url.rstrip("/")],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+)
 
 # Register API routers.
 app.include_router(auth_router)

@@ -1,3 +1,4 @@
+from app.config import settings
 
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -118,8 +119,8 @@ def login_user(
         key="eventsphere_session",
         value=token,
         httponly=True,
-        secure=False,  # Local HTTP development only
-        samesite="lax",
+        secure=settings.environment == "production",
+        samesite="none" if settings.environment == "production" else "lax",
         max_age=7 * 24 * 60 * 60,
         path="/",
     )
@@ -189,7 +190,8 @@ def logout_user(
     response.delete_cookie(
         key="eventsphere_session",
         path="/",
-        samesite="lax",
+        secure=settings.environment == "production",
+        samesite="none" if settings.environment == "production" else "lax",
     )
 
     return {"message": "Logged out successfully"}
